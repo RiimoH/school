@@ -1,12 +1,25 @@
+#!/usr/bin/env python
+# coding: utf-8
 
-#%%
 import csv
 
 
-#%%
 class QuizRangliste(object):
     def __init__(self, datei=None):
-        """
+        """Instanziert die QuizRangliste-Klasse.
+
+        Das txt-File sollte ein CSV-formatiert sein und
+        die folgenden Values aufweisen:
+        Name, Punkte, Zeit
+
+        Ausgabe:
+            -
+
+        Argumente:
+            datei -- Pfad zu txt-File
+
+        Elemente:
+            type(datei) == str,
 
         """
         self._datei = datei
@@ -17,7 +30,8 @@ class QuizRangliste(object):
                 r = csv.reader(f, delimiter=',')
                 for row in r:
                     try:
-                        self._rangliste[row[0]] = {'Punkte': int(row[1]), 'Zeit': float(row[2])}
+                        self._rangliste[row[0]] = {
+                            'Punkte': int(row[1]), 'Zeit': float(row[2])}
                     except IndexError:
                         continue
 
@@ -25,82 +39,127 @@ class QuizRangliste(object):
             with open(datei, 'w', encoding='utf-8') as f:
                 print('New empty file created.')
 
+        except PermissionError:
+            print('PermissionError: Not able to read!')
+
     def als_dictionary(self):
         """Returnt die Rangliste als Dictionary.
-        
+
+        Gibt die Rangliste unsortiert als Dictionary zurück.
+        Da die innere Struktur ein Dict ist, wird diese direkt zurückgegeben.
+
         Ausgabe:
-            Key = name, Value = {’Punkte’: punkte, ’Zeit’: zeit}
-        
+            {name = {’Punkte’: punkte, ’Zeit’: zeit}, ...}
+
         Argumente:
             -
-        
+
         Elemente:
             type(name) == str,
             type(punkte) == int,
             type(zeit) == float
-            
+
         """
         return self._rangliste
-    
+
     def als_liste(self):
         """Return die Rangliste als Liste.
-        
+
+        Gibt die Rangliste als Liste von Tuples wieder. Diese sind sortiert
+        nach Punkte (absteigend)
+        nach Zeit (aufsteigend)
+        nach Alphabet.
+
         Ausgabe:
             [(name, punkte, zeit), ...]
-        
+
         Argumente:
             -
-        
+
         Elemente:
             type(name) == str,
             type(punkte) == int,
             type(zeit) == float
-        
+
         """
         output = []
         for k, v in self._rangliste.items():
             output.append((k, v['Punkte'], v['Zeit']))
         return sorted(output, key=lambda x: (-x[1], x[2], x[0]))
-                
-            
 
     def als_string(self):
         """Return die Rangliste als String.
-        
+
+        Gibt die Rangliste als formatierter String zurück. Dieser ist wie
+        die Liste sortiert:
+        nach Punkte (absteigend)
+        nach Zeit (aufsteigend)
+        nach Alphabet.
+        Der Name ist linksbündig,
+        die Punktzahl ist zentriert,
+        Die Zeit ist auf eine Dezimalstelle gerundet und rechtsbündig.
+
+
         Ausgabe:
-            'name  | pkt |  zeit'
-        
+            'name  | pkt |  zeit\\n ...'
+
             Max   | 6 | 100.0
             Anna  | 5 |  20.6
             Laura | 5 |  20.6
             Fritz | 5 |  39.3
             Hans  | 2 |  45.2
-        
+
         Argumente:
             -
-        
+
         Elemente:
             type(name) == str,
             type(punkte) == int,
             type(zeit) == float
-        
-        
+
         """
-        pass
-    
+        name_max = max([len(x) for x in self._rangliste])
+        pkt_max = max([len(str(self._rangliste[x]['Punkte']))
+                       for x in self._rangliste])
+        zeit_max = max([len(str(round(self._rangliste[x]['Zeit'], 1)))
+                        for x in self._rangliste])
+        output = []
+
+        for k, v in self._rangliste.items():
+            intern = (k.ljust(name_max, ' ') +
+                      ' | ' +
+                      str(v['Punkte']).center(pkt_max, ' ') +
+                      ' | ' +
+                      str(round(v['Zeit'], 1)).rjust(zeit_max, ' '))
+            output.append(intern)
+
+        return '\n'.join(output)
+
     def resultat_addieren(self, name, pkt, zeit):
         """Fügt ein Resultat der Rangliste hinzu.
-        
+
         Falls ein der Name bereits vorhanden ist, werden die Resultate addiert.
         Falls der Name nicht existiert, wird ein neuer Eintrag erstellt.
         Der Name darf keine Kommas enthalten
-        
+
         Argumente:
-            name -- Name der Person, type = string
-            pkt  -- Erzielte Punkte, type = int, str
-            zeit -- Benötigte Zeit,  type = float, str
-            
+            name -- Name der Person,
+            pkt  -- Erzielte Punkte,
+            zeit -- Benötigte Zeit
+
+        Argumente:
+            -
+
+        Elemente:
+            type(name) == str,
+            type(punkte) == int, str
+            type(zeit) == float, str
+
         """
+        if ',' in name:
+            print('Keine Kommas im Namen erlaubt')
+            return
+
         try:
             name = str(name)
             pkt = int(pkt)
@@ -108,7 +167,7 @@ class QuizRangliste(object):
         except ValueError:
             print('ValueError: Please enter correct types.')
             return False
-        
+
         if name in self._rangliste:
             self._rangliste[name]['Punkte'] += int(pkt)
             self._rangliste[name]['Zeit'] += float(zeit)
@@ -116,16 +175,24 @@ class QuizRangliste(object):
         else:
             self._rangliste[name] = {'Punkte': pkt, 'Zeit': zeit}
             print(f'Rangliste wurde um {name} ergänzt.')
-        
+
         return True
 
-    
     def name_entfernen(self, name):
         """Entfernt einen Eintrag.
-        
+
+        Entfernt einen Eintrag der Rangliste, durch Eingabe des Namens.
+        Falls der Name nicht vorhanden ist, passiert nichts.
+
         Argumente:
-            name -- Name der Person, type = string
-        
+            name -- Name der Person
+
+        Argumente:
+            -
+
+        Elemente:
+            type(name) == str,
+
         """
         try:
             del self._rangliste[name]
@@ -133,48 +200,27 @@ class QuizRangliste(object):
         except KeyError:
             print("Zu diesem Namen existiert kein Eintrag. Does nothing.")
 
-
     def speichern(self, als=None):
         """Speichert die Rangliste als csv-Datei.
-        
+
+        Speichert die Rangliste als sortierte CSV-Datei in den angegebenen Pfad
+        Wird kein Pfad angegeben wird die alte Datei überschrieben.
+
         Argumente:
-            path (opt) -- Pfad zu neuer Datei, ansonsten wird alte Datei überschrieben. type = string
-         
+            als (opt) -- Pfad zu neuer Datei,
+                ansonsten wird alte Datei überschrieben.
+
+        Elemente:
+            type(als) == str,
+
         """
-        if als == None:
+        if als is None:
             als = self._datei
-        with open(als, 'w', encoding='utf-8') as f:
-            writer = csv.writer(f, delimiter=',')
-            li = self.als_liste()
-            for line in li:
-                writer.writerow(line)
-
-
-#%%
-qr = QuizRangliste(datei='rangliste.txt')
-
-
-#%%
-qr.resultat_addieren('Abdul', 8, 32.0)
-
-
-#%%
-qr.name_entfernen('Peter')
-
-
-#%%
-qr.speichern(path='resultat.txt')
-
-
-#%%
-qr._rangliste
-
-
-#%%
-qr.als_liste()
-
-
-#%%
-dir(qr)
-
-
+        try:
+            with open(als, 'w', encoding='utf-8') as f:
+                writer = csv.writer(f, delimiter=',')
+                li = self.als_liste()
+                for line in li:
+                    writer.writerow(line)
+        except PermissionError:
+            print('PermissionError: Not able to write!')
