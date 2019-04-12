@@ -5,3 +5,10 @@ Laura,5,20.55
 Fritz,5,39.3
 Peter,4,30.0
 Hans,2,45.24
+Salomon,7,40.0
+Reto,6,100.02
+Annina,5,20.55
+Lena,S,5,20.55
+Roy,5,39.3
+Larry,4,30.0
+3422*#@!,2,45.24

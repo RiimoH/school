@@ -1,6 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+"""
+Title: Testat.py
+Autor: Remo Herzog
+EMail: rherzog@hsr.ch
+Datum: 12.04.2019
+Organ: HSR Hochschule Rapperswil
+Zweck: Testat-Aufgabe Python: QuizRangliste-cls zur Verwaltung von HSRvote.
+"""
+
+
 import csv
 
 
@@ -32,15 +42,19 @@ class QuizRangliste(object):
                     try:
                         self._rangliste[row[0]] = {
                             'Punkte': int(row[1]), 'Zeit': float(row[2])}
-                    except IndexError:
+                    except (IndexError, ValueError, UnicodeDecodeError):
                         continue
 
         except FileNotFoundError:
             with open(datei, 'w', encoding='utf-8') as f:
                 print('New empty file created.')
 
-        except PermissionError:
-            print('PermissionError: Not able to read!')
+        except PermissionError as e:
+            print(f'{e}: Not able to read!')
+
+        except UnicodeDecodeError as e:
+            print(f'{e}: File might be corrupted!')
+            quit()
 
     def als_dictionary(self):
         """Returnt die Rangliste als Dictionary.
@@ -50,6 +64,10 @@ class QuizRangliste(object):
 
         Ausgabe:
             {name = {’Punkte’: punkte, ’Zeit’: zeit}, ...}
+
+            {'Noemi': {'Punkte': 7, 'Zeit': 40.0},
+            'Max': {'Punkte': 6, 'Zeit': 100.02},
+            'Anna': {'Punkte': 5, 'Zeit': 20.55}}
 
         Argumente:
             -
@@ -72,6 +90,10 @@ class QuizRangliste(object):
 
         Ausgabe:
             [(name, punkte, zeit), ...]
+
+            [('Noemi', 7, 40.0),
+            ('Max', 6, 100.02),
+            ('Anna', 5, 20.55)]
 
         Argumente:
             -
@@ -106,8 +128,6 @@ class QuizRangliste(object):
             Max   | 6 | 100.0
             Anna  | 5 |  20.6
             Laura | 5 |  20.6
-            Fritz | 5 |  39.3
-            Hans  | 2 |  45.2
 
         Argumente:
             -
@@ -124,13 +144,14 @@ class QuizRangliste(object):
         zeit_max = max([len(str(round(self._rangliste[x]['Zeit'], 1)))
                         for x in self._rangliste])
         output = []
+        li = self.als_liste()
 
-        for k, v in self._rangliste.items():
-            intern = (k.ljust(name_max, ' ') +
+        for i in li:
+            intern = (i[0].ljust(name_max, ' ') +
                       ' | ' +
-                      str(v['Punkte']).center(pkt_max, ' ') +
+                      str(i[1]).center(pkt_max, ' ') +
                       ' | ' +
-                      str(round(v['Zeit'], 1)).rjust(zeit_max, ' '))
+                      str(round(i[2], 1)).rjust(zeit_max, ' '))
             output.append(intern)
 
         return '\n'.join(output)

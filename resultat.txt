@@ -1,6 +1,14 @@
 Noemi,7,40.0
+Salomon,7,40.0
 Max,6,100.02
+Reto,6,100.02
 Anna,5,20.55
+Annina,5,20.55
 Laura,5,20.55
 Fritz,5,39.3
+Roy,5,39.3
+Larry,4,30.0
+Peter,4,30.0
+3422*#@!,2,45.24
 Hans,2,45.24
+Helen,1,100.0
