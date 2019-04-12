@@ -46,14 +46,17 @@ class QuizRangliste(object):
                         continue
 
         except FileNotFoundError:
-            with open(datei, 'w', encoding='utf-8') as f:
-                print('New empty file created.')
+            try:
+                with open(datei, 'w', encoding='utf-8') as f:
+                    print('New empty file created.')
+            except PermissionError as e:
+                print(f'{e}: Not able to write!')
 
         except PermissionError as e:
             print(f'{e}: Not able to read!')
 
         except UnicodeDecodeError as e:
-            print(f'{e}: File might be corrupted!')
+            print(f'{e}: Non Unicode Characters detected! --> quit')
             quit()
 
     def als_dictionary(self):
