@@ -15,6 +15,13 @@ import csv
 
 
 class QuizRangliste(object):
+    """Klasse zur Verwaltung von HSRvote Ergebnissen.
+
+    Diese Klasse erlaubt die Verwaltung von HSRvote Ergebnissen.
+    Diese müssen als CSV-Datei vorhanden sein.
+    Für die Instanzierung muss ein Dateipfad zu dem Text-File
+    angegeben werden. 
+    """
     def __init__(self, datei=None):
         """Instanziert die QuizRangliste-Klasse.
 
@@ -32,7 +39,11 @@ class QuizRangliste(object):
             type(datei) == str,
 
         """
-        self._datei = datei
+        if datei is not None:
+            self._datei = datei
+        else:
+            print('No filename given. help(QuizRangliste) for help.')
+            raise ValueError('QuizRangliste needs a file-path as argument.')
         self._rangliste = {}
 
         try:
